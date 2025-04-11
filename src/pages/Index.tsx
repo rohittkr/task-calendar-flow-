@@ -1,14 +1,23 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import AppLayout from '@/components/AppLayout';
+import { setEvents } from '@/store/slices/eventsSlice';
+import { setGoals } from '@/store/slices/goalsSlice';
+import { setTasks } from '@/store/slices/tasksSlice';
+import { mockEvents, mockGoals, mockTasks } from '@/data/mockData';
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const dispatch = useDispatch();
+  
+  // Load mock data on initial render
+  useEffect(() => {
+    dispatch(setEvents(mockEvents));
+    dispatch(setGoals(mockGoals));
+    dispatch(setTasks(mockTasks));
+  }, [dispatch]);
+  
+  return <AppLayout />;
 };
 
 export default Index;
