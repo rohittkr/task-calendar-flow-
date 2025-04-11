@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useDrag } from 'react-dnd';
-import { format, addDays, parseISO } from 'date-fns';
+import { format, addDays, parseISO, addMinutes } from 'date-fns';
 import { Event } from '@/types';
 import { selectEvent } from '@/store/slices/uiSlice';
 import { updateEvent } from '@/store/slices/eventsSlice';
