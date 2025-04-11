@@ -7,7 +7,7 @@ interface UIState {
   selectedTimeSlot: TimeSlot | null;
   selectedEventId: string | null;
   selectedGoalId: string | null;
-  currentDate: Date;
+  currentDate: string; // Changed from Date to string
   view: 'week' | 'day' | 'month';
 }
 
@@ -16,7 +16,7 @@ const initialState: UIState = {
   selectedTimeSlot: null,
   selectedEventId: null,
   selectedGoalId: null,
-  currentDate: new Date(),
+  currentDate: new Date().toISOString(), // Store as ISO string
   view: 'week',
 };
 
@@ -46,7 +46,8 @@ export const uiSlice = createSlice({
       state.selectedGoalId = null;
     },
     setCurrentDate: (state, action: PayloadAction<Date>) => {
-      state.currentDate = action.payload;
+      // Convert Date to ISO string before storing in Redux
+      state.currentDate = action.payload.toISOString();
     },
     setView: (state, action: PayloadAction<'week' | 'day' | 'month'>) => {
       state.view = action.payload;

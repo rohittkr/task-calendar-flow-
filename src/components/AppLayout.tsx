@@ -14,7 +14,8 @@ import { Plus } from 'lucide-react';
 
 const AppLayout: React.FC = () => {
   const dispatch = useDispatch();
-  const currentDate = useSelector((state: RootState) => state.ui.currentDate);
+  const currentDateString = useSelector((state: RootState) => state.ui.currentDate);
+  const currentDate = new Date(currentDateString); // Parse the ISO string to Date
   const view = useSelector((state: RootState) => state.ui.view);
 
   const handleCreateEvent = () => {

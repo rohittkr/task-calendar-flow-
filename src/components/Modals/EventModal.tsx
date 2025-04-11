@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { format, parse, set, addMinutes } from 'date-fns';
+import { format, parse, set, addMinutes, parseISO } from 'date-fns';
 import { 
   Dialog, 
   DialogContent, 
@@ -40,7 +40,8 @@ const EventModal: React.FC = () => {
   const selectedTimeSlot = useSelector((state: RootState) => state.ui.selectedTimeSlot);
   const selectedEventId = useSelector((state: RootState) => state.ui.selectedEventId);
   const events = useSelector((state: RootState) => state.events.events);
-  const currentDate = useSelector((state: RootState) => state.ui.currentDate);
+  const currentDateString = useSelector((state: RootState) => state.ui.currentDate);
+  const currentDate = parseISO(currentDateString);
   
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<Category>('work');

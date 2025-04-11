@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { format, addDays, startOfWeek, isToday } from 'date-fns';
+import { format, addDays, startOfWeek, isToday, parseISO } from 'date-fns';
 import { useDrop } from 'react-dnd';
 import { Event, TimeSlot } from '@/types';
 import { RootState } from '@/store';
 import { openEventModal } from '@/store/slices/uiSlice';
+import { updateEvent } from '@/store/slices/eventsSlice';
 import CalendarEvent from './CalendarEvent';
 import { cn } from '@/lib/utils';
 
@@ -63,8 +64,34 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate }) => {
     return { dayIndex, top, height };
   };
 
+  // Set up drop targets for each time slot
+  const [, drop] = useDrop(() => ({
+    accept: 'EVENT',
+    drop: (item: { id: string; type: string }, monitor) => {
+      const clientOffset = monitor.getClientOffset();
+      if (!clientOffset) return {};
+
+      // Get the DOM element at the drop position
+      const elementAtPoint = document.elementFromPoint(
+        clientOffset.x,
+        clientOffset.y
+      );
+
+      // Find the closest time-slot element
+      const timeSlotElement = elementAtPoint?.closest('.time-slot');
+      if (!timeSlotElement) return {};
+
+      // Get day index and hour from the time-slot data attributes
+      const dayIndex = parseInt(timeSlotElement.getAttribute('data-day-index') || '0', 10);
+      const hour = parseInt(timeSlotElement.getAttribute('data-hour') || '0', 10);
+      const minute = parseInt(timeSlotElement.getAttribute('data-minute') || '0', 10);
+
+      return { dayIndex, hour, minute };
+    }
+  }), []);
+
   return (
-    <div className="overflow-auto h-[calc(100vh-180px)] border rounded-lg">
+    <div className="overflow-auto h-[calc(100vh-180px)] border rounded-lg" ref={drop}>
       <div className="grid grid-cols-8 sticky top-0 bg-white z-10">
         <div className="p-2 border-b border-r"></div>
         {days.map((day, index) => (
@@ -100,6 +127,9 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate }) => {
               >
                 <div 
                   className="time-slot h-8 border-b border-dashed"
+                  data-day-index={dayIndex}
+                  data-hour={hour}
+                  data-minute={0}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleTimeSlotClick(hour, 0, dayIndex);
@@ -107,6 +137,9 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate }) => {
                 ></div>
                 <div 
                   className="time-slot h-8"
+                  data-day-index={dayIndex}
+                  data-hour={hour}
+                  data-minute={30}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleTimeSlotClick(hour, 30, dayIndex);
@@ -136,6 +169,8 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate }) => {
                 height: `${Math.max(height, 30)}px`,
                 width,
               }}
+              currentDate={currentDate}
+              days={days}
             />
           );
         })}
