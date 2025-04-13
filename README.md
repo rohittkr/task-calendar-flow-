@@ -1,73 +1,82 @@
-# Welcome to your Lovable project
+# 🗓️ Calendar Application - MyCourses
 
-## Project info
+A full-stack calendar application built using **React.js**, **Redux**, and **MongoDB**. This application allows users to manage events, tasks, and goals, mimicking a **Google Calendar** experience with drag-and-drop functionality, event creation, and state management.
 
-**URL**: https://lovable.dev/projects/a26394b3-fbee-452a-bc32-41385301dedb
+---
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- 📅 **Calendar View** with daily, weekly, and monthly event views.
+- ➕ **Create Events** by clicking on the calendar and filling out event details (Title, Category, Date, Start and End Time).
+- 🕒 **Time-Adjusted Events**: Events respect start and end times, displaying the duration on the calendar.
+- ✍️ **Edit Events**: Expand or contract events to adjust duration.
+- ❌ **Delete Events**: Remove events from the calendar.
+- 🗂️ **Task Management**: Drag-and-drop tasks from a goal list onto the calendar to create events with pre-filled details.
+- 🎨 **Event Categories**: Events categorized into 6 options: Exercise, Eating, Work, Relax, Family, and Social.
+- 🔄 **Drag and Drop**: Move events across days and times.
+- 💻 **Backend with MongoDB**: All event data is stored in a MongoDB database.
+- 🛠️ **State Management with Redux**: Centralized state management for handling events, tasks, and goals.
+- 🌐 **API Endpoints**:  
+  - **POST**: Create an event  
+  - **GET**: Fetch events and goals  
+  - **PUT**: Update event details
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a26394b3-fbee-452a-bc32-41385301dedb) and start prompting.
+## 🧰 Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+| **Tech**          | **Description**                      |
+|-------------------|--------------------------------------|
+| **React.js**      | Frontend framework for building UI   |
+| **Redux**         | State management for the app         |
+| **MongoDB**       | Database to store event data         |
+| **Node.js**       | Backend runtime for server-side logic|
+| **Express.js**    | Backend framework for API routes     |
+| **MongoDB Compass** | Cloud database for data storage     |
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🎯 Features Breakdown
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### **Create and Manage Events**
+- Events can be created with title, category (Exercise, Eating, Work, Relax, Family, Social), date, start, and end time.
+- Events can be expanded, contracted, or deleted.
 
-Follow these steps:
+### **Drag and Drop Functionality**
+- Users can drag and drop events on the calendar to change the time and date.
+- Tasks from a goal list can be dragged to the calendar and automatically create events.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### **Category and Task Integration**
+- Goals are color-coded and linked to specific tasks.
+- Clicking on a goal populates a list of related tasks.
+- Dragging a task to the calendar automatically creates an event using the task's details and color.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🛠️ API Endpoints
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- **POST** `/api/events`: Create a new event.
+- **GET** `/api/events`: Fetch all events.
+- **GET** `/api/events/:id`: Fetch event by ID.
+- **PUT** `/api/events/:id`: Update event details.
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
 
-**Use GitHub Codespaces**
+### Explanation:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Title**: Starts with a calendar-related title and describes the general purpose of the project.
+- **Features**: Key features of the calendar app, such as event creation, task management, and drag-and-drop functionality.
+- **Tech Stack**: Lists the technologies used in the project.
+- **Features Breakdown**: Explains each feature in detail, with examples like the goal-task integration and event manipulation.
+- **API Endpoints**: Details the POST, GET, and PUT endpoints for creating and managing events.
+- **Getting Started**: Provides steps to set up the application locally, including installation of dependencies, MongoDB configuration, and starting both backend and frontend servers.
 
-## What technologies are used for this project?
 
-This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🚀 Getting Started
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/a26394b3-fbee-452a-bc32-41385301dedb) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/<your-username>/mycourses-calendar.git
+   cd mycourses-calendar
