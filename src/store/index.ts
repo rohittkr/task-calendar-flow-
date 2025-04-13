@@ -1,4 +1,3 @@
-
 import { configureStore } from '@reduxjs/toolkit';
 import eventsReducer from './slices/eventsSlice';
 import goalsReducer from './slices/goalsSlice';
@@ -7,10 +6,10 @@ import uiReducer from './slices/uiSlice';
 
 export const store = configureStore({
   reducer: {
-    events: eventsReducer,
-    goals: goalsReducer,
-    tasks: tasksReducer,
-    ui: uiReducer,
+    events: eventsReducer,  // Your events slice reducer
+    goals: goalsReducer,    // Other slices like goals
+    tasks: tasksReducer,    // Other slices like tasks
+    ui: uiReducer,          // UI-related slice
   },
 });
 

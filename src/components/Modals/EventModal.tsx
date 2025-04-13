@@ -1,18 +1,17 @@
-
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { format, parse, set, addMinutes, parseISO } from 'date-fns';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import { format, parse, addMinutes, parseISO } from 'date-fns';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -22,7 +21,7 @@ import {
 import { Event, Category } from '@/types';
 import { RootState } from '@/store';
 import { closeEventModal } from '@/store/slices/uiSlice';
-import { addEvent, updateEvent, deleteEvent } from '@/store/slices/eventsSlice';
+import { createEvent, updateEventById, deleteEventById } from '@/store/thunks/eventsThunks';
 import { Trash } from 'lucide-react';
 
 const categories: { value: Category; label: string }[] = [
@@ -42,18 +41,17 @@ const EventModal: React.FC = () => {
   const events = useSelector((state: RootState) => state.events.events);
   const currentDateString = useSelector((state: RootState) => state.ui.currentDate);
   const currentDate = parseISO(currentDateString);
-  
+
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<Category>('work');
   const [date, setDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('10:00');
+  const [loading, setLoading] = useState(false);
 
-  // Initialize form when opening modal
   useEffect(() => {
     if (isOpen) {
       if (selectedEventId) {
-        // Edit existing event
         const event = events.find(e => e.id === selectedEventId);
         if (event) {
           setTitle(event.title);
@@ -63,32 +61,25 @@ const EventModal: React.FC = () => {
           setEndTime(event.endTime);
         }
       } else if (selectedTimeSlot) {
-        // Create new event from time slot
         const { hour, minute, dayIndex } = selectedTimeSlot;
-        
-        // Calculate the date based on week day
         const targetDate = new Date(currentDate);
         const weekStart = new Date(targetDate);
         weekStart.setDate(targetDate.getDate() - targetDate.getDay());
         const slotDate = new Date(weekStart);
         slotDate.setDate(weekStart.getDate() + dayIndex);
-        
-        // Format time values
+
         const formattedHour = hour.toString().padStart(2, '0');
         const formattedMinute = minute.toString().padStart(2, '0');
-        
-        // Set values
+
         setTitle('');
         setCategory('work');
         setDate(format(slotDate, 'yyyy-MM-dd'));
         setStartTime(`${formattedHour}:${formattedMinute}`);
-        
-        // Set end time to 1 hour later
+
         const startDateTime = parse(`${formattedHour}:${formattedMinute}`, 'HH:mm', new Date());
         const endDateTime = addMinutes(startDateTime, 60);
         setEndTime(format(endDateTime, 'HH:mm'));
       } else {
-        // Default values for new event
         setTitle('');
         setCategory('work');
         setDate(format(new Date(), 'yyyy-MM-dd'));
@@ -102,12 +93,18 @@ const EventModal: React.FC = () => {
     dispatch(closeEventModal());
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!title.trim()) {
       alert('Please enter a title');
       return;
     }
 
+    if (startTime >= endTime) {
+      alert('End time must be later than start time');
+      return;
+    }
+
+    setLoading(true);
     const eventData = {
       title,
       category,
@@ -116,20 +113,28 @@ const EventModal: React.FC = () => {
       endTime,
     };
 
-    if (selectedEventId) {
-      // Update existing event
-      dispatch(updateEvent({ id: selectedEventId, ...eventData }));
-    } else {
-      // Create new event
-      dispatch(addEvent(eventData));
+    try {
+      if (selectedEventId) {
+        await dispatch(updateEventById({ id: selectedEventId, ...eventData }));
+      } else {
+        await dispatch(createEvent(eventData));
+      }
+    } catch (error) {
+      alert('An error occurred while saving the event');
     }
-
+    setLoading(false);
     handleClose();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedEventId) {
-      dispatch(deleteEvent(selectedEventId));
+      setLoading(true);
+      try {
+        await dispatch(deleteEventById(selectedEventId));
+      } catch (error) {
+        alert('An error occurred while deleting the event');
+      }
+      setLoading(false);
       handleClose();
     }
   };
@@ -140,12 +145,10 @@ const EventModal: React.FC = () => {
         <DialogHeader>
           <DialogTitle>{selectedEventId ? 'Edit Event' : 'Create Event'}</DialogTitle>
         </DialogHeader>
-        
+
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="title" className="text-right">
-              Title
-            </Label>
+            <Label htmlFor="title" className="text-right">Title</Label>
             <Input
               id="title"
               value={title}
@@ -153,13 +156,11 @@ const EventModal: React.FC = () => {
               className="col-span-3"
             />
           </div>
-          
+
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="category" className="text-right">
-              Category
-            </Label>
-            <Select 
-              value={category} 
+            <Label htmlFor="category" className="text-right">Category</Label>
+            <Select
+              value={category}
               onValueChange={(value) => setCategory(value as Category)}
             >
               <SelectTrigger className="col-span-3">
@@ -174,11 +175,9 @@ const EventModal: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right">
-              Date
-            </Label>
+            <Label htmlFor="date" className="text-right">Date</Label>
             <Input
               id="date"
               type="date"
@@ -187,11 +186,9 @@ const EventModal: React.FC = () => {
               className="col-span-3"
             />
           </div>
-          
+
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="startTime" className="text-right">
-              Start Time
-            </Label>
+            <Label htmlFor="startTime" className="text-right">Start Time</Label>
             <Input
               id="startTime"
               type="time"
@@ -200,11 +197,9 @@ const EventModal: React.FC = () => {
               className="col-span-3"
             />
           </div>
-          
+
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="endTime" className="text-right">
-              End Time
-            </Label>
+            <Label htmlFor="endTime" className="text-right">End Time</Label>
             <Input
               id="endTime"
               type="time"
@@ -214,20 +209,17 @@ const EventModal: React.FC = () => {
             />
           </div>
         </div>
-        
+
         <DialogFooter className="flex justify-between">
           {selectedEventId && (
-            <Button variant="destructive" onClick={handleDelete}>
-              <Trash className="mr-2 h-4 w-4" />
-              Delete
+            <Button variant="destructive" onClick={handleDelete} disabled={loading}>
+              <Trash className="mr-2 h-4 w-4" /> Delete
             </Button>
           )}
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>
-              {selectedEventId ? 'Update' : 'Create'}
+            <Button variant="outline" onClick={handleClose} disabled={loading}>Cancel</Button>
+            <Button onClick={handleSave} disabled={loading}>
+              {loading ? 'Saving...' : selectedEventId ? 'Update' : 'Create'}
             </Button>
           </div>
         </DialogFooter>
