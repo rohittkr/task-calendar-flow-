@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/events';
+const API_URL =
+  import.meta.env.DEV
+    ? 'http://localhost:5000/api/events' // Local dev
+    : '/api/events'; // Vercel production
 
 export const getEvents = async () => {
   try {
@@ -12,7 +15,7 @@ export const getEvents = async () => {
   }
 };
 
-export const createEvent = async (eventData) => {
+export const createEvent = async (eventData: any) => {
   try {
     const response = await axios.post(API_URL, eventData);
     return response.data;
@@ -22,9 +25,12 @@ export const createEvent = async (eventData) => {
   }
 };
 
-export const updateEvent = async (eventId, eventData) => {
+export const updateEvent = async (eventId: string, eventData: any) => {
   try {
-    const response = await axios.put(`${API_URL}/${eventId}`, eventData);
+    const response = await axios.put(API_URL, {
+      id: eventId,
+      ...eventData,
+    });
     return response.data;
   } catch (error) {
     console.error('Error updating event:', error);
@@ -32,9 +38,11 @@ export const updateEvent = async (eventId, eventData) => {
   }
 };
 
-export const deleteEvent = async (eventId) => {
+export const deleteEvent = async (eventId: string) => {
   try {
-    const response = await axios.delete(`${API_URL}/${eventId}`);
+    const response = await axios.delete(API_URL, {
+      data: { id: eventId },
+    });
     return response.data;
   } catch (error) {
     console.error('Error deleting event:', error);
